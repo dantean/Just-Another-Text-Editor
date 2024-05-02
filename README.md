@@ -53,7 +53,7 @@ MIT License - The License file is provided here : (./LICENSE)
 ## GitHub Repository
 
 
-Github Repository: 
+Github Repository: https://github.com/dantean/Just-Another-Text-Editor
 
 
 ## Credit Where Credit Is Due
