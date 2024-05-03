@@ -4,7 +4,7 @@ import { header } from './header';
 
 export default class {
   constructor() {
-    const localData = localStorage.getItem('content');
+    const localData = localStorage.getItem('content') || "";
 
     // check if CodeMirror is loaded
     if (typeof CodeMirror === 'undefined') {
