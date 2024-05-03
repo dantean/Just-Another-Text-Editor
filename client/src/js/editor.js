@@ -4,15 +4,15 @@ import { header } from './header';
 
 export default class {
   constructor() {
-    const localData = localStorage.getItem('content') || header;
+    const localData = localStorage.getItem('content');
 
-    // Check if CodeMirror is loaded
+    // check if CodeMirror is loaded
     if (typeof CodeMirror === 'undefined') {
       throw new Error('CodeMirror is not loaded');
     }
 
     this.editor = CodeMirror(document.querySelector('#main'), {
-      value: header,
+      value: '',
       mode: 'javascript',
       theme: 'monokai',
       lineNumbers: true,
@@ -22,43 +22,21 @@ export default class {
       tabSize: 2,
     });
 
-    // When the editor is ready, set the value to whatever is stored in IndexedDB.
-    // Fall back to localStorage if nothing is stored in IndexedDB, and if neither is available, set the value to header.
+    // When the editor is ready, set the value to whatever is stored in indexeddb.
+    // Fall back to localStorage if nothing is stored in indexeddb, and if neither is available, set the value to header.
     getDb().then((data) => {
       console.info('Loaded data from IndexedDB, injecting into editor');
-      console.log('Data from IndexedDB:', data);  // Log the actual data fetched
-      console.log('Type of data from IndexedDB:', typeof data);  // Log the type of data fetched
-
-      if (typeof data === 'string') {
-        this.editor.setValue(data);
-      } else if (typeof data === 'object' && data !== null) {
-        try {
-          const jsonData = JSON.stringify(data);
-          this.editor.setValue(jsonData);
-        } catch (e) {
-          console.error('Error stringifying data:', e);
-          this.editor.setValue(localData);  // Use localData as a fallback
-        }
-      } else {
-        console.error('Received non-string and non-object data from IndexedDB:', data);
-        this.editor.setValue(localData);  // Use localData as a fallback
-      }
-    }).catch(error => {
-      console.error('Failed to load data from IndexedDB:', error);
-      this.editor.setValue(localData);  // Use localData as a fallback in case of error
+      this.editor.setValue(data || localData || header);
     });
 
     this.editor.on('change', () => {
-      const currentEditorValue = this.editor.getValue();
-      console.log('Saving current editor value to localStorage:', currentEditorValue);
-      localStorage.setItem('content', currentEditorValue);
+      localStorage.setItem('content', this.editor.getValue());
     });
 
-    // Save the content of the editor when the editor itself loses focus
+    // Save the content of the editor when the editor itself is loses focus
     this.editor.on('blur', () => {
-      const currentEditorValue = this.editor.getValue();
-      console.log('The editor has lost focus, saving to IndexedDB:', currentEditorValue);
-      putDb(currentEditorValue);
+      console.log('The editor has lost focus');
+      putDb(localStorage.getItem('content'));
     });
   }
 }
